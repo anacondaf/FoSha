@@ -1,0 +1,32 @@
+import React from "react";
+
+//css
+import "./homepage.style.css";
+
+function Homepage() {
+	return (
+		<div className="homepage">
+			<div className="overlay"></div>
+
+			<div className="typewritter">
+				<h1>
+					<p
+						class="typewrite"
+						data-period="2000"
+						data-type='[ "Hi! We are FoSha.", "We are social.", "We are creative.", "We are innovation." ]'
+					>
+						<span class="wrap"></span>
+					</p>
+				</h1>
+			</div>
+
+			<div className="buttons-group">
+				<a href="/newfeed" class="btn btn-getstarted-custom">
+					get started
+				</a>
+			</div>
+		</div>
+	);
+}
+
+export default Homepage;
