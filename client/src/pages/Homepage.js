@@ -21,7 +21,7 @@ function Homepage() {
 			</div>
 
 			<div className="buttons-group">
-				<a href="/newfeed" class="btn btn-getstarted-custom">
+				<a href="/newsfeed" class="btn btn-getstarted-custom">
 					get started
 				</a>
 			</div>

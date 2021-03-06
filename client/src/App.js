@@ -16,12 +16,14 @@ function App() {
 		<Router>
 			<Switch>
 				<Route path="/" exact>
-					{/* <Homepage /> */}
-					<WritePost />
+					<Homepage />
 				</Route>
-				<Route path="/newfeed">
+				<Route path="/newsfeed">
 					<Navbar />
 					<Newsfeed />
+				</Route>
+				<Route path="/post/compose">
+					<WritePost />
 				</Route>
 			</Switch>
 		</Router>
