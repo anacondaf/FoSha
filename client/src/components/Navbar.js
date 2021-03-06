@@ -13,7 +13,7 @@ function Navbar(props) {
 					fosha
 				</a>
 
-				<a className="write-post" href="/post/compose">
+				<a className="write-post-btn" href="/post/compose">
 					<span>Write post</span>
 				</a>
 			</div>

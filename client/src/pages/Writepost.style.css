@@ -1,0 +1,166 @@
+.write-post {
+	width: 100%;
+	height: 100%;
+	font-family: "Nunito";
+	background-color: #f0f4f7;
+}
+
+.ml-5 {
+	margin-left: 5em;
+}
+
+.write-post .all-container {
+	padding: 1em 8em;
+}
+
+.left-side-block {
+	display: flex;
+	flex-direction: column;
+	flex-basis: 65%;
+}
+
+.top-navbar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.controll-block {
+	display: flex;
+	align-items: center;
+}
+
+.controll-block > svg {
+	width: 30px;
+	height: 30px;
+	color: rgb(148, 148, 148);
+}
+
+.controll-block p {
+	font-size: 18px;
+	font-weight: 700;
+	padding-left: 1em;
+}
+
+.combo-function {
+	font-size: 17px;
+	font-weight: 600;
+	width: 150px;
+	display: flex;
+	justify-content: space-around;
+}
+
+.combo-function a {
+	color: #000;
+	position: relative;
+	padding: 0.5em;
+	transition: background-color 0.3s ease;
+}
+
+.combo-function :not(.isFocused) {
+	font-weight: 400;
+}
+
+.combo-function a.isFocused::after {
+	content: "";
+	position: absolute;
+	bottom: 0;
+	left: 0.5em;
+	width: 20px;
+	height: 4px;
+	background-color: #4157df;
+	border-radius: 5px;
+}
+
+.combo-function a:hover {
+	background-color: #dcdff0;
+	border-radius: 5px;
+}
+
+.editing-content {
+	background-color: #fff;
+	border: 1px solid #d2d6db;
+	border-radius: 5px;
+}
+
+.post-inner {
+	padding: 2rem 4rem;
+}
+
+.post-cover-image {
+	white-space: nowrap;
+	position: relative;
+	padding: 0.75em 1em;
+	border: 1px solid #d2d6db;
+	border-radius: 5px;
+	outline: 0;
+	background-color: inherit;
+	cursor: pointer;
+}
+
+.post-cover-image label {
+	font-weight: 600;
+	font-family: "Nunito";
+	font-size: 16px;
+}
+
+.upload-cover-btn {
+	opacity: 0;
+	cursor: pointer;
+	overflow: hidden;
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 100%;
+}
+
+.publish-and-save {
+	display: flex;
+}
+
+.right-side-block {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+}
+.write-post .btn-outline-custom {
+	background-color: #4157df;
+	color: #fff;
+	width: 80px;
+	font-size: 12px;
+	text-transform: uppercase;
+	font-weight: 600;
+	padding: 0.7rem 0.8rem;
+	border: 1px solid transparent;
+	transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+		border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+	border-radius: 5px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.write-post .btn-outline-custom:first-child {
+	margin: 0 10px 0 0;
+}
+
+.write-post .btn-outline-custom > svg {
+	margin-left: 5px;
+	width: 12px;
+	height: 12px;
+}
+
+.write-post .btn-outline-custom.active,
+.write-post .btn-outline-custom:hover,
+.write-post .btn-outline-custom:active,
+.write-post .show > .write-post .btn-outline-custom.dropdown-toggle {
+	background-color: #3e52d8;
+}
+
+.write-post .btn-outline-custom.active,
+.write-post .btn-outline-custom:hover,
+.write-post .btn-outline-custom:active,
+.write-post .show > .write-post .btn-outline-custom.dropdown-toggle {
+	color: #fff;
+}

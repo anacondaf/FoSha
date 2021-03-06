@@ -6,6 +6,7 @@ import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 //import custom pages
 import Homepage from "./pages/Homepage";
 import Newsfeed from "./pages/Newsfeed";
+import WritePost from "./pages/WritePost";
 
 //import custom component
 import Navbar from "./components/Navbar";
@@ -15,7 +16,8 @@ function App() {
 		<Router>
 			<Switch>
 				<Route path="/" exact>
-					<Homepage />
+					{/* <Homepage /> */}
+					<WritePost />
 				</Route>
 				<Route path="/newfeed">
 					<Navbar />

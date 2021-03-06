@@ -18,7 +18,7 @@
 	font-size: 30px;
 }
 
-.write-post {
+.write-post-btn {
 	padding: 0.8em 0.7em;
 	font-weight: 800;
 	border: none;
@@ -31,6 +31,6 @@
 	outline: none;
 }
 
-.write-post:hover {
+.write-post-btn:hover {
 	background-color: #313bb3;
 }
