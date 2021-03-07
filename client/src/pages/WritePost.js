@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 //css
 import "./Writepost.style.css";
@@ -6,7 +6,21 @@ import "./Writepost.style.css";
 import Icon from "@mdi/react";
 import { mdiArrowLeft, mdiChevronDown, mdiChevronUp } from "@mdi/js";
 
+import Loader from "react-loader-spinner";
+
 function WritePost(props) {
+	//categories select options
+	let [selectedOption, setSelectedOption] = useState("Food");
+
+	//cover image state
+	let [coverUrl, setCoverUrl] = useState("");
+
+	//upload spinner state
+	let [loading, setLoading] = useState(0);
+
+	//upload failed
+	let [uploadFailed, setUploadFailed] = useState(false);
+
 	//prevent textarea enter for new line
 	const preventNewLine = (e) => {
 		return (e) => {
@@ -16,10 +30,134 @@ function WritePost(props) {
 		};
 	};
 
-	const selectList = {
-		selectedOption: "Mango",
-		options: ["Apple", "Orange", "Mango"],
+	const dropOption = (e) => {
+		let options = document.querySelector(".options");
+		options.classList.toggle("drop");
 	};
+
+	const OPTIONS = [
+		{ id: 1, name: "Trang mieng" },
+		{ id: 2, name: "Trai cay" },
+		{ id: 3, name: "Banh" },
+		{ id: 4, name: "Cocktail" },
+		{ id: 5, name: "Detox" },
+		{ id: 6, name: "Sinh to" },
+	];
+
+	let sendImage = async (e) => {
+		let files = e.target.files;
+		let data = new FormData();
+		data.append("file", files[0]);
+		data.append("upload_preset", "bdyzskvu");
+
+		setLoading(1);
+
+		const response = await fetch(
+			"https://api.cloudinary.com/v1_1/djbkxkx8m/image/upload",
+			{
+				method: "POST",
+				body: data,
+			}
+		);
+
+		const file = await response.json();
+
+		setCoverUrl(file.secure_url);
+		setLoading(2);
+	};
+
+	let uploadComponent;
+
+	if (loading === 0) {
+		uploadComponent = (
+			<>
+				<button className="post-cover-image">
+					<label for="cover-image-input">Add cover image</label>
+					<input
+						id="cover-image-input"
+						type="file"
+						accept="image/*"
+						class="upload-cover-btn"
+						name="cover-image"
+						onChange={sendImage}
+					/>
+				</button>
+				{uploadFailed ? (
+					<div className="error-logs">
+						<span>Image resolution must below 1920x1080</span>
+					</div>
+				) : null}
+			</>
+		);
+	} else if (loading === 1) {
+		uploadComponent = (
+			<>
+				<Loader
+					type="ThreeDots"
+					color="#000"
+					height={24}
+					width={24}
+					radius={0}
+				/>
+				<h3
+					style={{
+						marginLeft: "5px",
+					}}
+				>
+					Uploading....
+				</h3>
+			</>
+		);
+	} else if (loading === 2) {
+		uploadComponent = (
+			<>
+				<img
+					src={coverUrl}
+					style={{
+						width: 235,
+						height: 100,
+						objectFit: "cover",
+						borderRadius: "5px",
+						marginRight: "1em",
+					}}
+				/>
+				<div className="change-and-remove">
+					<button
+						className="post-cover-image"
+						style={{
+							padding: "0.5em 1em",
+						}}
+					>
+						<span
+							style={{
+								fontFamily: "Nunito",
+								fontSize: "15px",
+								fontWeight: "600",
+							}}
+						>
+							Change
+						</span>
+					</button>
+
+					<button
+						className="post-cover-image"
+						style={{ padding: "0.5em 1em", border: "none" }}
+					>
+						<span
+							style={{
+								fontFamily: "Nunito",
+								fontSize: "15px",
+								fontWeight: "600",
+								color: "red",
+							}}
+						>
+							Remove
+						</span>
+					</button>
+				</div>{" "}
+			</>
+		);
+	}
 
 	return (
 		<div className="write-post main">
@@ -46,16 +184,7 @@ function WritePost(props) {
 
 					<div className="editing-content ml-5">
 						<div className="post-header-field post-inner">
-							<button className="post-cover-image">
-								<label for="cover-image-input">Add cover image</label>
-								<input
-									id="cover-image-input"
-									type="file"
-									accept="image/*"
-									class="upload-cover-btn"
-									data-max-file-size-mb="25"
-								/>
-							</button>
+							<div className="upload-cover-image">{uploadComponent}</div>
 
 							<div className="article-form-title">
 								<textarea
@@ -65,10 +194,19 @@ function WritePost(props) {
 									autocomplete="off"
 									class="crayons-textfield"
 									aria-label="Post Title"
-									autofocus="false"
+									autofocus="true"
 									onKeyDown={preventNewLine()}
 								></textarea>
 							</div>
+
+							<textarea
+								type="text"
+								placeholder="Tags(max 4)"
+								autocomplete="off"
+								class="tags-textfield"
+								aria-label="Post Title"
+								onKeyDown={preventNewLine()}
+							></textarea>
 
 							<div className="category-group">
 								<label for="sel-btn" className="select-label">
@@ -76,38 +214,41 @@ function WritePost(props) {
 								</label>
 
 								<div className="select-area">
-									<div className="select-button" id="sel-btn">
+									<div
+										className="select-button"
+										id="sel-btn"
+										onClick={dropOption}
+									>
 										<span>Food</span>
 										<div className="chevrons">
 											<i class="fas fa-chevron-up icon-chevron"></i>
 											<i class="fas fa-chevron-down icon-chevron"></i>
 										</div>
 									</div>
-									<div className="options">
-										<div class="option">
-											<input
-												class="s-c top"
-												type="radio"
-												name="platform"
-												value="codepen"
-											/>
-											<input
-												class="s-c bottom"
-												type="radio"
-												name="platform"
-												value="codepen"
-											/>
-											<i class="fab fa-codepen" />
-											<span class="label">CodePen</span>
-											<span class="opt-val">CodePen</span>
-										</div>
-										<div id="option-bg"></div>
+									<div className="options drop">
+										{OPTIONS.map((option) => {
+											return (
+												<div class="option">
+													<span class="label">{option.name}</span>
+												</div>
+											);
+										})}
 									</div>
 								</div>
 							</div>
 						</div>
 
-						<div className="post-body-field post-inner"></div>
+						<div className="post-body-field post-inner">
+							<div className="post-body-wrap-content">
+								<textarea
+									type="text"
+									placeholder="Start your content ..."
+									autocomplete="off"
+									class="content-textfield"
+									aria-label="Post Title"
+								></textarea>
+							</div>
+						</div>
 					</div>
 
 					<div className="publish-and-save ml-5">

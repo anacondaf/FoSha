@@ -1,6 +1,6 @@
 .write-post {
 	width: 100%;
-	height: 100vh;
+	height: 100%;
 	font-family: "Nunito";
 	background-color: #f0f4f7;
 }
@@ -10,7 +10,7 @@
 }
 
 .write-post .all-container {
-	padding: 1em 8em;
+	padding: 1em 8em 10px 8em;
 }
 
 .left-side-block {
@@ -23,6 +23,7 @@
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
+	height: 50px;
 }
 
 .controll-block {
@@ -88,10 +89,27 @@
 	background-color: #fff;
 	border: 1px solid #d2d6db;
 	border-radius: 5px;
+	display: flex;
+	flex-direction: column;
+	overflow-y: auto;
+	height: calc(100vh - 1em - 115px);
 }
 
-.post-inner {
-	padding: 2rem 4rem;
+.post-header-field {
+	height: 320px;
+}
+
+.post-inner:last-child {
+	padding: 1em 4rem 1em 4rem;
+}
+
+.post-inner:first-child {
+	padding: 1.5rem 4rem 1em 4rem;
+}
+
+.upload-cover-image {
+	display: flex;
+	align-items: center;
 }
 
 .post-cover-image {
@@ -103,12 +121,21 @@
 	outline: 0;
 	background-color: inherit;
 	cursor: pointer;
+	margin-right: 5px;
+	transition: all 0.4s ease;
 }
 
 .post-cover-image label {
 	font-weight: 700;
 	font-family: "Nunito";
 	font-size: 16px;
+}
+
+.error-logs {
+	font-size: 14px;
+	font-family: "Nunito";
+	color: red;
+	font-weight: 600;
 }
 
 .upload-cover-btn {
@@ -124,10 +151,11 @@
 
 .post-cover-image:hover {
 	background-color: #f5faff;
+	border: 2px solid #aaa4a4;
 }
 
 .article-form-title {
-	margin: 1.5em 0;
+	margin: 1.5em 0 0.75em 0;
 }
 
 .article-form-title .crayons-textfield {
@@ -151,12 +179,36 @@
 	font-size: 50px;
 	font-weight: 800;
 	font-family: "Nunito";
-	color: #64707d;
+	color: #000000;
 }
 
 .article-form-title .crayons-textfield::placeholder {
 	font-size: 50px;
 	color: #64707d;
+}
+
+.tags-textfield {
+	border: none;
+	padding: 0;
+	margin: 0;
+	outline: none;
+	box-shadow: none;
+	resize: none;
+	transition: none;
+	width: 100%;
+	letter-spacing: normal;
+	word-spacing: normal;
+	text-transform: none;
+	text-indent: 0px;
+	text-shadow: none;
+	overflow-wrap: break-word;
+	overflow: hidden;
+	column-count: initial !important;
+	height: 30px;
+	font-size: 16px;
+	font-weight: 500;
+	font-family: "Nunito";
+	color: #000000;
 }
 
 .category-group {
@@ -167,14 +219,15 @@
 	font-family: "Nunito";
 }
 
+.select-area {
+	flex: 1;
+	position: relative;
+}
+
 .select-label {
 	flex-basis: 37%;
 	font-size: 17px;
 	font-weight: 600;
-}
-
-.select-area {
-	flex: 1;
 }
 
 .select-button {
@@ -183,12 +236,11 @@
 	align-items: center;
 	position: relative;
 	background-color: #fff;
-	border-radius: 4px;
-	width: 40%;
+	border-radius: 2px;
+	width: 50%;
 	cursor: pointer;
-	padding: 5px;
-	border: 1px solid #e2eded;
-	border-color: #eaf1f1 #e4eded #dbe7e7 #e4eded;
+	padding: 5px 8px;
+	border: 0.5px solid #d2d6db;
 }
 
 .select-button .chevrons {
@@ -197,7 +249,30 @@
 }
 
 .options {
+	position: absolute;
+	top: 100%;
+	width: 50%;
+	margin-top: 1px;
+	background-color: #fff;
+	border-radius: 2px;
+	box-shadow: 2px 2px 5px #d2d6db;
+	height: 150px;
+	overflow: auto;
+}
+
+.drop {
 	display: none;
+}
+
+.option {
+	cursor: pointer;
+	padding: 15px 8px;
+	transition: 0.3s ease all;
+	height: 50px;
+}
+
+.option:hover {
+	background-color: rgb(223, 223, 223);
 }
 
 .icon-chevron {
@@ -205,8 +280,44 @@
 	color: #b6c1c4;
 }
 
+.post-body-field {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+}
+
+.post-body-wrap-content {
+	height: 100%;
+}
+
+.content-textfield {
+	width: 100%;
+	border: none;
+	padding: 0;
+	margin: 0;
+	outline: none;
+	box-shadow: none;
+	resize: none;
+	transition: none;
+	width: 100%;
+	letter-spacing: normal;
+	word-spacing: normal;
+	text-transform: none;
+	text-indent: 0px;
+	text-shadow: none;
+	overflow-wrap: break-word;
+	column-count: initial !important;
+	height: 240px;
+	font-size: 20px;
+	font-weight: 500;
+	font-family: "Nunito";
+	color: #000000;
+}
+
 .publish-and-save {
 	display: flex;
+	height: 45px;
+	margin-top: 10px;
 }
 
 .right-side-block {
@@ -214,6 +325,7 @@
 	flex-direction: column;
 	flex: 1;
 }
+
 .write-post .btn-outline-custom {
 	background-color: #4157df;
 	color: #fff;
