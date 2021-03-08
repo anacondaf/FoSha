@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 //css
 import "./Writepost.style.css";
@@ -21,6 +21,26 @@ function WritePost(props) {
 	//upload failed
 	let [uploadFailed, setUploadFailed] = useState(false);
 
+	//user put content
+	let [postContent, setPostContent] = useState({
+		caption: "",
+		mainbackground: "",
+		category: "",
+		content: "",
+		tagsList: [],
+	});
+
+	useEffect(() => {
+		if (JSON.parse(localStorage.getItem("post-content")) === null) {
+			localStorage.setItem("post-content", JSON.stringify(postContent));
+		} else {
+			let postFromStorage = JSON.parse(localStorage.getItem("post-content"));
+			setPostContent(postFromStorage);
+			setCoverUrl(postFromStorage.mainbackground);
+			setLoading(2);
+		}
+	}, []);
+
 	//prevent textarea enter for new line
 	const preventNewLine = (e) => {
 		return (e) => {
@@ -33,6 +53,14 @@ function WritePost(props) {
 	const dropOption = (e) => {
 		let options = document.querySelector(".options");
 		options.classList.toggle("drop");
+	};
+
+	const userChooseOption = (e) => {
+		let option = e.target;
+		let options = document.querySelector(".select-button");
+		options.children[0].innerHTML = option.innerHTML;
+
+		dropOption(e);
 	};
 
 	const OPTIONS = [
@@ -63,6 +91,18 @@ function WritePost(props) {
 		const file = await response.json();
 
 		setCoverUrl(file.secure_url);
+
+		let { caption, category, content, tagsList } = postContent;
+
+		setPostContent(
+			(postContent = {
+				caption: caption,
+				mainbackground: file.secure_url,
+				category: category,
+				content: content,
+				tagsList: tagsList,
+			})
+		);
 		setLoading(2);
 	};
 
@@ -109,6 +149,8 @@ function WritePost(props) {
 			</>
 		);
 	} else if (loading === 2) {
+		localStorage.getItem("post-content");
+
 		uploadComponent = (
 			<>
 				<img
@@ -159,6 +201,51 @@ function WritePost(props) {
 		);
 	}
 
+	const changePostContent = (e) => {
+		return (e) => {
+			// let postContentStorage = localStorage.getItem("post-content");
+
+			// localStorage.setItem("post-content", e.target.value);
+
+			let {
+				caption,
+				mainbackground,
+				category,
+				content,
+				tagsList,
+			} = postContent;
+
+			switch (e.target.ariaLabel) {
+				case "Post Title":
+					setPostContent(
+						(postContent = {
+							caption: e.target.value,
+							mainbackground: mainbackground,
+							category: category,
+							content: content,
+							tagsList: tagsList,
+						})
+					);
+
+					break;
+				case "Post Content":
+					setPostContent(
+						(postContent = {
+							caption: caption,
+							mainbackground: mainbackground,
+							category: category,
+							content: e.target.value,
+							tagsList: tagsList,
+						})
+					);
+
+					break;
+			}
+
+			localStorage.setItem("post-content", JSON.stringify(postContent));
+		};
+	};
+
 	return (
 		<div className="write-post main">
 			<div className="all-container">
@@ -182,7 +269,7 @@ function WritePost(props) {
 						</div>
 					</div>
 
-					<div className="editing-content ml-5">
+					<div className="editing-content">
 						<div className="post-header-field post-inner">
 							<div className="upload-cover-image">{uploadComponent}</div>
 
@@ -196,6 +283,8 @@ function WritePost(props) {
 									aria-label="Post Title"
 									autofocus="true"
 									onKeyDown={preventNewLine()}
+									onChange={changePostContent()}
+									value={postContent.caption}
 								></textarea>
 							</div>
 
@@ -204,7 +293,7 @@ function WritePost(props) {
 								placeholder="Tags(max 4)"
 								autocomplete="off"
 								class="tags-textfield"
-								aria-label="Post Title"
+								aria-label="Post Tag"
 								onKeyDown={preventNewLine()}
 							></textarea>
 
@@ -228,8 +317,8 @@ function WritePost(props) {
 									<div className="options drop">
 										{OPTIONS.map((option) => {
 											return (
-												<div class="option">
-													<span class="label">{option.name}</span>
+												<div class="option" onClick={userChooseOption}>
+													{option.name}
 												</div>
 											);
 										})}
@@ -245,7 +334,9 @@ function WritePost(props) {
 									placeholder="Start your content ..."
 									autocomplete="off"
 									class="content-textfield"
-									aria-label="Post Title"
+									aria-label="Post Content"
+									onChange={changePostContent()}
+									value={postContent.content}
 								></textarea>
 							</div>
 						</div>
@@ -256,7 +347,12 @@ function WritePost(props) {
 							Publish
 						</a>
 
-						<a href="index.html" class="btn btn-outline-custom">
+						<a
+							class="btn btn-outline-custom"
+							onClick={() => {
+								console.log(postContent);
+							}}
+						>
 							Save
 						</a>
 					</div>

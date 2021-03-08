@@ -16,7 +16,7 @@ function PostItem(props) {
 		<article class="post">
 			<div class="post-header">
 				<h2 class="post-title">
-					<a href="index.html">{item.caption}</a>
+					<a href="/view/dsadsaj">{item.caption}</a>
 				</h2>
 				<ul class="post-meta">
 					<li>
@@ -35,7 +35,7 @@ function PostItem(props) {
 			</div>
 
 			<div class="post-preview">
-				<a href="index.html">
+				<a href="/view/dsadsaj">
 					<img src={item.mainbackground} alt="" class="img-fluid rounded" />
 				</a>
 			</div>
