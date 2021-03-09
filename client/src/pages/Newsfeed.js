@@ -23,10 +23,10 @@ function Newsfeed() {
 	//call api
 	useEffect(() => {
 		axios
-			.get("http://localhost:3004/posts")
+			.get("http://localhost:3004/getPosts")
 			.then((res) => setPostItem(res.data.postList))
 			.catch((e) => console.log(e));
-	}, []);
+	}, [postItem]);
 
 	return (
 		<div className="newsfeed">

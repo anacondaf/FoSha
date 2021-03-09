@@ -1,17 +1,15 @@
 import React, { useState, useEffect } from "react";
+import { Redirect } from "react-router-dom";
+import axios from "axios";
 
 //css
 import "./Writepost.style.css";
 
 import Icon from "@mdi/react";
 import { mdiArrowLeft, mdiChevronDown, mdiChevronUp } from "@mdi/js";
-
 import Loader from "react-loader-spinner";
 
 function WritePost(props) {
-	//categories select options
-	let [selectedOption, setSelectedOption] = useState("Food");
-
 	//cover image state
 	let [coverUrl, setCoverUrl] = useState("");
 
@@ -25,10 +23,19 @@ function WritePost(props) {
 	let [postContent, setPostContent] = useState({
 		caption: "",
 		mainbackground: "",
-		category: "",
+		category: "Food",
 		content: "",
 		tagsList: [],
 	});
+
+	let [tags, setTags] = useState("");
+
+	//redirect to /newsfeed
+	let [redirect, setRedirect] = useState(null);
+
+	//caption-field and content-field height
+	let [captionHeight, setCaptionHeight] = useState(60);
+	let [contentHeight, setContentHeight] = useState(240);
 
 	useEffect(() => {
 		if (JSON.parse(localStorage.getItem("post-content")) === null) {
@@ -36,18 +43,43 @@ function WritePost(props) {
 		} else {
 			let postFromStorage = JSON.parse(localStorage.getItem("post-content"));
 			setPostContent(postFromStorage);
+			postFromStorage.mainbackground ? setLoading(2) : setLoading(0);
 			setCoverUrl(postFromStorage.mainbackground);
-			setLoading(2);
+		}
+
+		if (JSON.parse(localStorage.getItem("textarea-height")) === null) {
+			localStorage.setItem(
+				"textarea-height",
+				JSON.stringify({
+					captionHeight,
+					contentHeight,
+				})
+			);
+		} else {
+			let textareaHeight = JSON.parse(localStorage.getItem("textarea-height"));
+			setCaptionHeight(textareaHeight.captionHeight);
+			setContentHeight(textareaHeight.contentHeight);
 		}
 	}, []);
 
-	//prevent textarea enter for new line
+	//prevent tags input enter for new line
 	const preventNewLine = (e) => {
 		return (e) => {
 			if (e.key === "Enter") {
 				e.preventDefault();
 			}
 		};
+	};
+
+	const onKeyUp = (e) => {
+		if (e.keyCode === 188) {
+			setTags(tags + "  ");
+		}
+	};
+
+	//value change for tags input
+	const changeTags = (e) => {
+		setTags(e.target.value);
 	};
 
 	const dropOption = (e) => {
@@ -59,6 +91,21 @@ function WritePost(props) {
 		let option = e.target;
 		let options = document.querySelector(".select-button");
 		options.children[0].innerHTML = option.innerHTML;
+
+		//add category to localStorage
+		let { caption, mainbackground, content, tagsList } = postContent;
+
+		setPostContent(
+			(postContent = {
+				caption: caption,
+				mainbackground: mainbackground,
+				category: option.innerHTML,
+				content: content,
+				tagsList: tagsList,
+			})
+		);
+
+		localStorage.setItem("post-content", JSON.stringify(postContent));
 
 		dropOption(e);
 	};
@@ -103,6 +150,9 @@ function WritePost(props) {
 				tagsList: tagsList,
 			})
 		);
+
+		localStorage.setItem("post-content", JSON.stringify(postContent));
+
 		setLoading(2);
 	};
 
@@ -117,7 +167,7 @@ function WritePost(props) {
 						id="cover-image-input"
 						type="file"
 						accept="image/*"
-						class="upload-cover-btn"
+						className="upload-cover-btn"
 						name="cover-image"
 						onChange={sendImage}
 					/>
@@ -203,10 +253,6 @@ function WritePost(props) {
 
 	const changePostContent = (e) => {
 		return (e) => {
-			// let postContentStorage = localStorage.getItem("post-content");
-
-			// localStorage.setItem("post-content", e.target.value);
-
 			let {
 				caption,
 				mainbackground,
@@ -215,8 +261,13 @@ function WritePost(props) {
 				tagsList,
 			} = postContent;
 
+			let textarea = JSON.parse(localStorage.getItem("textarea-height"));
+
 			switch (e.target.ariaLabel) {
 				case "Post Title":
+					setCaptionHeight(e.target.scrollHeight);
+					textarea.captionHeight = e.target.scrollHeight;
+
 					setPostContent(
 						(postContent = {
 							caption: e.target.value,
@@ -229,6 +280,9 @@ function WritePost(props) {
 
 					break;
 				case "Post Content":
+					textarea.contentHeight = e.target.scrollHeight;
+					setContentHeight(e.target.scrollHeight);
+
 					setPostContent(
 						(postContent = {
 							caption: caption,
@@ -242,11 +296,31 @@ function WritePost(props) {
 					break;
 			}
 
+			localStorage.setItem("textarea-height", JSON.stringify(textarea));
 			localStorage.setItem("post-content", JSON.stringify(postContent));
 		};
 	};
 
-	return (
+	const postPostToApi = () => {
+		postContent.caption = "# ".concat(postContent.caption);
+
+		let tagWords = tags.split(/\W+/);
+
+		if (tagWords[tagWords.length] === "") {
+			postContent.tagsList = tagWords.slice(0, tagWords.length - 1);
+		} else postContent.tagsList = tagWords.slice(0, tagWords.length);
+
+		axios.post("http://localhost:3004/addPost", { postContent });
+
+		localStorage.removeItem("post-content");
+		localStorage.removeItem("textarea-height");
+		setLoading(0);
+		setRedirect("/newsfeed");
+	};
+
+	return redirect !== null ? (
+		<Redirect to={redirect} />
+	) : (
 		<div className="write-post main">
 			<div className="all-container">
 				<div className="left-side-block">
@@ -279,23 +353,30 @@ function WritePost(props) {
 									id="article-form-title"
 									placeholder="New post title here..."
 									autocomplete="off"
-									class="crayons-textfield"
+									className="caption-textfield"
 									aria-label="Post Title"
 									autofocus="true"
 									onKeyDown={preventNewLine()}
 									onChange={changePostContent()}
 									value={postContent.caption}
+									style={{ height: captionHeight }}
 								></textarea>
 							</div>
 
-							<textarea
+							<input
+								data-testid="tag-input"
+								id="tag-input"
 								type="text"
-								placeholder="Tags(max 4)"
+								placeholder="Add up to 4 tags..."
 								autocomplete="off"
-								class="tags-textfield"
+								className="tags-textfield"
 								aria-label="Post Tag"
+								pattern="[0-9A-Za-z, ]+"
 								onKeyDown={preventNewLine()}
-							></textarea>
+								onKeyUp={onKeyUp}
+								onChange={changeTags}
+								value={tags}
+							></input>
 
 							<div className="category-group">
 								<label for="sel-btn" className="select-label">
@@ -310,14 +391,14 @@ function WritePost(props) {
 									>
 										<span>Food</span>
 										<div className="chevrons">
-											<i class="fas fa-chevron-up icon-chevron"></i>
-											<i class="fas fa-chevron-down icon-chevron"></i>
+											<i className="fas fa-chevron-up icon-chevron"></i>
+											<i className="fas fa-chevron-down icon-chevron"></i>
 										</div>
 									</div>
 									<div className="options drop">
 										{OPTIONS.map((option) => {
 											return (
-												<div class="option" onClick={userChooseOption}>
+												<div className="option" onClick={userChooseOption}>
 													{option.name}
 												</div>
 											);
@@ -333,28 +414,25 @@ function WritePost(props) {
 									type="text"
 									placeholder="Start your content ..."
 									autocomplete="off"
-									class="content-textfield"
+									className="content-textfield"
 									aria-label="Post Content"
 									onChange={changePostContent()}
 									value={postContent.content}
+									style={{ height: contentHeight }}
 								></textarea>
 							</div>
 						</div>
 					</div>
 
 					<div className="publish-and-save ml-5">
-						<a href="index.html" class="btn btn-outline-custom isFocused">
+						<a
+							className="btn btn-outline-custom isFocused"
+							onClick={postPostToApi}
+						>
 							Publish
 						</a>
 
-						<a
-							class="btn btn-outline-custom"
-							onClick={() => {
-								console.log(postContent);
-							}}
-						>
-							Save
-						</a>
+						<a className="btn btn-outline-custom">Save</a>
 					</div>
 				</div>
 

@@ -13,5 +13,15 @@ module.exports.getPosts = async (req, res) => {
 };
 
 module.exports.getPostId = (req, res) => {
-	res.send("Get post relevant to post_id");
+	let { id } = req.params;
+
+	Post.findById(id)
+		.then((result) => {
+			res.status(200).json({
+				"postContent": result,
+			});
+		})
+		.catch((e) => {
+			console.log(e);
+		});
 };

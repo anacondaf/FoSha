@@ -2,12 +2,12 @@ const express = require("express");
 const router = express.Router();
 
 // /* Route Identify
-//  * GET /posts: Get all post data
-//  * GET /posts/:id: Get post relevant to post_id
+//  * GET /getPosts: Get all post data
+//  * GET /getPosts/:id: Get post relevant to post_id
 //  */
 
 //controllers
-let { getPosts, getPostId } = require("../controllers/post.controller");
+let { getPosts, getPostId } = require("../controllers/getpost.controller");
 
 router.get("/", getPosts);
 

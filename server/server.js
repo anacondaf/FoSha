@@ -12,13 +12,13 @@ const PORT = 3004 || process.env.PORT;
 app.use(cors());
 
 // parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: false }));
 
 // parse application/json
-app.use(bodyParser.json());
+app.use(express.json());
 
 //ROUTES
-const GETPOSTS = require("./routes/posts");
+const GETPOSTS = require("./routes/getPosts");
 const ADDPOST = require("./routes/addPost");
 
 mongoose.connect(
@@ -37,8 +37,8 @@ app.get("/", (req, res) => {
 });
 
 //Use middleware
-app.use("/posts", GETPOSTS);
-app.use("/addpost", ADDPOST);
+app.use("/getPosts", GETPOSTS);
+app.use("/addPost", ADDPOST);
 
 app.listen(PORT, () => {
 	console.log(`Server is running on ${PORT}`);

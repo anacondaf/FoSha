@@ -1,4 +1,5 @@
 import React from "react";
+import ReactMarkDown from "react-markdown";
 
 import Icon from "@mdi/react";
 import {
@@ -13,35 +14,37 @@ function PostItem(props) {
 	let { item } = props;
 
 	return (
-		<article class="post">
-			<div class="post-header">
-				<h2 class="post-title">
-					<a href="/view/dsadsaj">{item.caption}</a>
+		<article className="post">
+			<div className="post-header">
+				<h2 className="post-title">
+					<a href={`/view/${item._id}`}>{item.caption}</a>
 				</h2>
-				<ul class="post-meta">
+				<ul className="post-meta">
 					<li>
 						<Icon clasName="mdi" path={mdiCalendar} />
-						<a>May 03, 2020</a>
+						<a>{item.date}</a>
 					</li>
 					<li>
 						<Icon clasName="mdi" path={mdiTagTextOutline} />{" "}
-						<a href="index.html">{item.tags}</a>
+						<a>{item.tags.length} tags</a>
 					</li>
 					<li>
 						<Icon clasName="mdi" path={mdiCommentMultipleOutline} />{" "}
-						<a href="index.html">{item.comments} Comments</a>
+						<a>{item.comments} Comments</a>
 					</li>
 				</ul>
 			</div>
 
-			<div class="post-preview">
-				<a href="/view/dsadsaj">
-					<img src={item.mainbackground} alt="" class="img-fluid rounded" />
-				</a>
-			</div>
+			{item.mainbackground ? (
+				<div className="post-preview">
+					<a href={`/view/${item._id}`}>
+						<img src={item.mainbackground} alt="" class="img-fluid rounded" />
+					</a>
+				</div>
+			) : null}
 
-			<div class="post-content">
-				<p>{item.description} [...]</p>
+			<div className="post-content">
+				<ReactMarkDown children={item.description + " [...]"} />
 			</div>
 
 			<div>

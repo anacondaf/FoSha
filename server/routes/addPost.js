@@ -2,12 +2,12 @@ const express = require("express");
 const router = express.Router();
 
 // /* Route Identify
-//  * Post /addpost: Write new post
+//  * Post /add-post: Write new post
 //  */
 
-router.post("/", (req, res) => {
-	console.log(req.body);
-	res.send(req.body);
-});
+//controllers
+const { addPost } = require("../controllers/addpost.controller");
+
+router.post("/", addPost);
 
 module.exports = router;

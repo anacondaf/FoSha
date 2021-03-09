@@ -6,10 +6,11 @@ let PostSchema = new mongoose.Schema({
 	mainbackground: String,
 	category: String,
 	description: String,
+	content: String,
 	star: Number,
 	comments: Number,
-	tags: String,
-	date: Date,
+	tags: [String],
+	date: String,
 });
 
 module.exports = mongoose.model("Post", PostSchema, "POST");
