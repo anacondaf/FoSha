@@ -88,6 +88,6 @@ window.onload = function () {
 		document.documentElement.scrollTo({
 			top: 0,
 			behavior: "smooth",
-		}); // For Safari// For Chrome, Firefox, IE and Opera
-	}
+		});
+	} // For Safari// For Chrome, Firefox, IE and Opera
 };

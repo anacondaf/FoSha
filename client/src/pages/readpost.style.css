@@ -24,17 +24,40 @@
 	font-family: "Nunito";
 	height: fit-content;
 }
-
 .content-main {
 	padding: 1em 3em;
 	display: flex;
 	flex-direction: column;
 }
 
-.content-main h1 {
+.content-main .caption h1 {
 	font-weight: 800;
 	font-size: 35px;
 	margin: 0;
+	word-wrap: break-word;
+}
+
+.content-header {
+	margin-top: 1em;
+}
+
+.content-body {
+	font-size: 19px;
+	font-weight: 500;
+}
+
+.content-body h2,
+h3,
+h4,
+h5,
+h6 {
+	font-size: 25px;
+}
+
+.content-body img {
+	width: 600px;
+	height: 400px;
+	object-fit: cover;
 }
 
 .tags {
@@ -86,6 +109,15 @@
 	font-weight: 700;
 	font-size: 15px;
 	margin: 0 8px;
+}
+
+.author .author-name {
+	margin: 0 8px;
+	font-family: "Nunito";
+	font-weight: 700;
+	font-size: 15px;
+	cursor: pointer;
+	color: #000;
 }
 
 .date {
@@ -145,13 +177,15 @@
 	padding-top: 15px;
 }
 
-.upper-part blockquote {
+.upper-part .author-name {
 	padding-top: 30px;
 	padding-left: 14px;
 	margin: 0;
 	font-size: 20px;
 	font-family: "Nunito";
 	font-weight: 800;
+	cursor: pointer;
+	color: #000;
 }
 
 .below-part {
@@ -170,6 +204,7 @@
 	color: #fff;
 	font-size: 15px;
 	font-weight: 600;
+	cursor: pointer;
 }
 
 .below-part .join-date {

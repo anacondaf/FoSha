@@ -10,17 +10,22 @@ import { useParams } from "react-router-dom";
 import "./readpost.style.css";
 
 function Readpost(props) {
-	let [MARKDOWN, setMarkdown] = useState("");
-	let [post, setPostContent] = useState({});
+	let [post, setPostContent] = useState({
+		caption: "",
+		mainbackground: "",
+		category: "Food",
+		content: "",
+		tags: [],
+	});
 
 	let { post_id } = useParams();
 
 	useEffect(() => {
-		let result = axios
+		console.log(post);
+		axios
 			.get(`http://localhost:3004/getPosts/${post_id}`)
 			.then((result) => {
 				setPostContent(result.data.postContent);
-				setMarkdown(result.data.postContent.content);
 			})
 			.catch((error) => console.log(error));
 	}, []);
@@ -36,16 +41,16 @@ function Readpost(props) {
 
 					<div className="content-main">
 						<div className="content-header">
-							<ReactMarkDown children={post.caption} />
+							<ReactMarkDown children={post.caption} className="caption" />
 
 							<ul className="tags">
-								{/* {post.tags.map((tag) => {
+								{post.tags.map((tag) => {
 									return (
 										<li>
 											<a># {tag}</a>
 										</li>
 									);
-								})} */}
+								})}
 							</ul>
 
 							<div className="author-date">
@@ -53,7 +58,9 @@ function Readpost(props) {
 									<a>
 										<img src="https://yt3.ggpht.com/ytc/AAUvwnhSeGCbeHJD09S7X-Qo8yuQKJqYdHa85OqkBDzSmg=s900-c-k-c0x00ffffff-no-rj"></img>
 									</a>
-									<p>Gordon Ramsay</p>
+									<a className="author-name" href="#">
+										Gordon Ramsay
+									</a>
 								</div>
 
 								<div className="date">
@@ -65,7 +72,7 @@ function Readpost(props) {
 						</div>
 
 						<div className="content-body">
-							<ReactMarkDown children={MARKDOWN} />
+							<ReactMarkDown children={post.content} />
 						</div>
 					</div>
 				</div>
@@ -86,7 +93,9 @@ function Readpost(props) {
 								}}
 							></img>
 
-							<blockquote className="author-name">Gordon Ramsay</blockquote>
+							<a className="author-name" href="#">
+								Gordon Ramsay
+							</a>
 						</div>
 
 						<div className="below-part">

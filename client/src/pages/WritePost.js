@@ -1,12 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Redirect } from "react-router-dom";
 import axios from "axios";
+import autosize from "autosize";
 
 //css
 import "./Writepost.style.css";
 
 import Icon from "@mdi/react";
-import { mdiArrowLeft, mdiChevronDown, mdiChevronUp } from "@mdi/js";
+import {
+	mdiArrowLeft,
+	mdiChevronDown,
+	mdiChevronUp,
+	mdiFileImageOutline,
+} from "@mdi/js";
 import Loader from "react-loader-spinner";
 
 function WritePost(props) {
@@ -15,6 +21,9 @@ function WritePost(props) {
 
 	//upload spinner state
 	let [loading, setLoading] = useState(0);
+	//content upload image loading
+	let [contentImageLoading, setContentImageLoading] = useState(0);
+	let [contentImageMarkdown, setContentImageMarkdown] = useState("");
 
 	//upload failed
 	let [uploadFailed, setUploadFailed] = useState(false);
@@ -34,8 +43,13 @@ function WritePost(props) {
 	let [redirect, setRedirect] = useState(null);
 
 	//caption-field and content-field height
-	let [captionHeight, setCaptionHeight] = useState(60);
+	let [captionHeight, setCaptionHeight] = useState(68);
 	let [contentHeight, setContentHeight] = useState(240);
+
+	//useRef
+	let popup = useRef();
+	let captionTextField = useRef();
+	let contentTextField = useRef();
 
 	useEffect(() => {
 		if (JSON.parse(localStorage.getItem("post-content")) === null) {
@@ -60,6 +74,9 @@ function WritePost(props) {
 			setCaptionHeight(textareaHeight.captionHeight);
 			setContentHeight(textareaHeight.contentHeight);
 		}
+
+		autosize(contentTextField.current);
+		autosize(captionTextField.current);
 	}, []);
 
 	//prevent tags input enter for new line
@@ -104,10 +121,20 @@ function WritePost(props) {
 				tagsList: tagsList,
 			})
 		);
-
 		localStorage.setItem("post-content", JSON.stringify(postContent));
-
 		dropOption(e);
+	};
+
+	const contentImageAutoCopy = (e) => {
+		let copyContentImage = document.querySelector(".markdown-image-syntax");
+		copyContentImage.select();
+		document.execCommand("copy");
+
+		popup.current.classList.add("animation");
+
+		setTimeout(() => {
+			popup.current.classList.remove("animation");
+		}, 1000);
 	};
 
 	const OPTIONS = [
@@ -119,6 +146,7 @@ function WritePost(props) {
 		{ id: 6, name: "Sinh to" },
 	];
 
+	//user upload image for CAPTION
 	let sendImage = async (e) => {
 		let files = e.target.files;
 		let data = new FormData();
@@ -156,10 +184,35 @@ function WritePost(props) {
 		setLoading(2);
 	};
 
-	let uploadComponent;
+	//user upload image for their CONTENT inside
+	let contentImageUpload = async (e) => {
+		let files = e.target.files;
+		let data = new FormData();
+		data.append("file", files[0]);
+		data.append("upload_preset", "bdyzskvu");
+
+		setContentImageLoading(1);
+
+		const response = await fetch(
+			"https://api.cloudinary.com/v1_1/djbkxkx8m/image/upload",
+			{
+				method: "POST",
+				body: data,
+			}
+		);
+
+		const file = await response.json();
+
+		setContentImageMarkdown(`![Alt Text](${file.secure_url})`);
+
+		setContentImageLoading(2);
+	};
+
+	//mainbackground image for CAPTION
+	let captionMainBackground;
 
 	if (loading === 0) {
-		uploadComponent = (
+		captionMainBackground = (
 			<>
 				<button className="post-cover-image">
 					<label for="cover-image-input">Add cover image</label>
@@ -180,7 +233,7 @@ function WritePost(props) {
 			</>
 		);
 	} else if (loading === 1) {
-		uploadComponent = (
+		captionMainBackground = (
 			<>
 				<Loader
 					type="ThreeDots"
@@ -201,7 +254,7 @@ function WritePost(props) {
 	} else if (loading === 2) {
 		localStorage.getItem("post-content");
 
-		uploadComponent = (
+		captionMainBackground = (
 			<>
 				<img
 					src={coverUrl}
@@ -251,6 +304,41 @@ function WritePost(props) {
 		);
 	}
 
+	//image for CONTENT
+	let contentImageComponent;
+
+	if (contentImageLoading === 1) {
+		contentImageComponent = (
+			<>
+				<Loader
+					type="ThreeDots"
+					color="#000"
+					height={24}
+					width={24}
+					radius={0}
+					style={{ marginLeft: "10px" }}
+				/>
+			</>
+		);
+	} else if (contentImageLoading === 2) {
+		contentImageComponent = (
+			<>
+				<div className="markdown-image">
+					<input
+						className="markdown-image-syntax"
+						readOnly
+						value={contentImageMarkdown}
+						onClick={contentImageAutoCopy}
+					></input>
+
+					<div className="popup" ref={popup}>
+						<span>Copy to clipboard!</span>
+					</div>
+				</div>
+			</>
+		);
+	}
+
 	const changePostContent = (e) => {
 		return (e) => {
 			let {
@@ -265,8 +353,8 @@ function WritePost(props) {
 
 			switch (e.target.ariaLabel) {
 				case "Post Title":
-					setCaptionHeight(e.target.scrollHeight);
-					textarea.captionHeight = e.target.scrollHeight;
+					setCaptionHeight(e.target.style.scrollHeight);
+					textarea.captionHeight = e.target.style.height;
 
 					setPostContent(
 						(postContent = {
@@ -280,8 +368,8 @@ function WritePost(props) {
 
 					break;
 				case "Post Content":
-					textarea.contentHeight = e.target.scrollHeight;
-					setContentHeight(e.target.scrollHeight);
+					setContentHeight(e.target.style.height);
+					textarea.contentHeight = e.target.style.height;
 
 					setPostContent(
 						(postContent = {
@@ -295,7 +383,6 @@ function WritePost(props) {
 
 					break;
 			}
-
 			localStorage.setItem("textarea-height", JSON.stringify(textarea));
 			localStorage.setItem("post-content", JSON.stringify(postContent));
 		};
@@ -345,7 +432,7 @@ function WritePost(props) {
 
 					<div className="editing-content">
 						<div className="post-header-field post-inner">
-							<div className="upload-cover-image">{uploadComponent}</div>
+							<div className="upload-cover-image">{captionMainBackground}</div>
 
 							<div className="article-form-title">
 								<textarea
@@ -359,7 +446,8 @@ function WritePost(props) {
 									onKeyDown={preventNewLine()}
 									onChange={changePostContent()}
 									value={postContent.caption}
-									style={{ height: captionHeight }}
+									style={{ height: captionHeight, resize: "none" }}
+									ref={captionTextField}
 								></textarea>
 							</div>
 
@@ -409,6 +497,22 @@ function WritePost(props) {
 						</div>
 
 						<div className="post-body-field post-inner">
+							<div className="content-image">
+								<button className="post-content-image">
+									<Icon path={mdiFileImageOutline} />
+									<span>Upload Image</span>
+									<input
+										id="content-image-input"
+										className="upload-image-btn"
+										type="file"
+										accept="image/*"
+										name="content-image"
+										onChange={contentImageUpload}
+									/>
+								</button>
+								{contentImageComponent}
+							</div>
+
 							<div className="post-body-wrap-content">
 								<textarea
 									type="text"
@@ -418,7 +522,8 @@ function WritePost(props) {
 									aria-label="Post Content"
 									onChange={changePostContent()}
 									value={postContent.content}
-									style={{ height: contentHeight }}
+									style={{ height: contentHeight, resize: "none" }}
+									ref={contentTextField}
 								></textarea>
 							</div>
 						</div>

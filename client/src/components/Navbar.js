@@ -9,7 +9,7 @@ function Navbar(props) {
 	return (
 		<header className="navbar">
 			<div className="all-container">
-				<a href="/" class="logo">
+				<a href="/newsfeed" class="logo">
 					fosha
 				</a>
 
