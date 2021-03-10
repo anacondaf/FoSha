@@ -45,11 +45,13 @@ function Readpost(props) {
 
 							<ul className="tags">
 								{post.tags.map((tag) => {
-									return (
-										<li>
-											<a># {tag}</a>
-										</li>
-									);
+									if (tag !== "") {
+										return (
+											<li>
+												<a># {tag}</a>
+											</li>
+										);
+									}
 								})}
 							</ul>
 
