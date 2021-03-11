@@ -21,9 +21,8 @@ function Readpost(props) {
 	let { post_id } = useParams();
 
 	useEffect(() => {
-		console.log(post);
 		axios
-			.get(`https://api-fosha.herokuapp.com/getPosts/${post_id}`)
+			.get(`http://localhost:8080/getPosts/${post_id}`)
 			.then((result) => {
 				setPostContent(result.data.postContent);
 			})

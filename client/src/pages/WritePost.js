@@ -7,12 +7,7 @@ import autosize from "autosize";
 import "./Writepost.style.css";
 
 import Icon from "@mdi/react";
-import {
-	mdiArrowLeft,
-	mdiChevronDown,
-	mdiChevronUp,
-	mdiFileImageOutline,
-} from "@mdi/js";
+import { mdiArrowLeft, mdiFileImageOutline } from "@mdi/js";
 import Loader from "react-loader-spinner";
 
 function WritePost(props) {
@@ -138,7 +133,8 @@ function WritePost(props) {
 	};
 
 	const OPTIONS = [
-		{ id: 1, name: "Trang mieng" },
+		{ id: 0, name: "Trang mieng" },
+		{ id: 1, name: "Food" },
 		{ id: 2, name: "Trai cay" },
 		{ id: 3, name: "Banh" },
 		{ id: 4, name: "Cocktail" },
@@ -299,7 +295,7 @@ function WritePost(props) {
 							Remove
 						</span>
 					</button>
-				</div>{" "}
+				</div>
 			</>
 		);
 	}
@@ -393,11 +389,17 @@ function WritePost(props) {
 
 		let tagWords = tags.split(/\W+/);
 
-		if (tagWords[tagWords.length] === "") {
-			postContent.tagsList = tagWords.slice(0, tagWords.length - 1);
-		} else postContent.tagsList = tagWords.slice(0, tagWords.length);
+		if (tagWords[tagWords.length - 1] === "") {
+			tagWords = tagWords.slice(0, tagWords.length - 1);
+		}
 
-		axios.post("https://api-fosha.herokuapp.com/addPost", { postContent });
+		if (tagWords[0] === "") {
+			tagWords = tagWords.slice(1, tagWords.length);
+		}
+
+		postContent.tagsList = tagWords.slice(0, tagWords.length);
+
+		axios.post("http://localhost:8080/addPost", { postContent });
 
 		localStorage.removeItem("post-content");
 		localStorage.removeItem("textarea-height");
@@ -484,9 +486,13 @@ function WritePost(props) {
 										</div>
 									</div>
 									<div className="options drop">
-										{OPTIONS.map((option) => {
+										{OPTIONS.map((option, index) => {
 											return (
-												<div className="option" onClick={userChooseOption}>
+												<div
+													className="option"
+													onClick={userChooseOption}
+													key={index}
+												>
 													{option.name}
 												</div>
 											);

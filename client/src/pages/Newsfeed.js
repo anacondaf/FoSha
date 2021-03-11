@@ -23,7 +23,7 @@ function Newsfeed() {
 	//call api
 	useEffect(() => {
 		axios
-			.get("https://api-fosha.herokuapp.com/getPosts")
+			.get("http://localhost:8080/getPosts")
 			.then((res) => setPostItem(res.data.postList))
 			.catch((e) => console.log(e));
 	}, [postItem]);
@@ -176,8 +176,8 @@ function Newsfeed() {
 				</div>
 
 				<div className="posts">
-					{postItem.map((item) => {
-						return <Post item={item} />;
+					{postItem.map((item, index) => {
+						return <Post item={item} key={index} />;
 					})}
 				</div>
 			</div>
