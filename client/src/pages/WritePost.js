@@ -10,6 +10,8 @@ import Icon from "@mdi/react";
 import { mdiArrowLeft, mdiFileImageOutline } from "@mdi/js";
 import Loader from "react-loader-spinner";
 
+const API_URL = "http://localhost:8080";
+
 function WritePost(props) {
 	//cover image state
 	let [coverUrl, setCoverUrl] = useState("");
@@ -30,6 +32,7 @@ function WritePost(props) {
 		category: "Food",
 		content: "",
 		tagsList: [],
+		cloudinary_public_id: "",
 	});
 
 	let [tags, setTags] = useState("");
@@ -105,7 +108,13 @@ function WritePost(props) {
 		options.children[0].innerHTML = option.innerHTML;
 
 		//add category to localStorage
-		let { caption, mainbackground, content, tagsList } = postContent;
+		let {
+			caption,
+			mainbackground,
+			content,
+			tagsList,
+			cloudinary_public_id,
+		} = postContent;
 
 		setPostContent(
 			(postContent = {
@@ -114,6 +123,7 @@ function WritePost(props) {
 				category: option.innerHTML,
 				content: content,
 				tagsList: tagsList,
+				cloudinary_public_id: cloudinary_public_id,
 			})
 		);
 		localStorage.setItem("post-content", JSON.stringify(postContent));
@@ -142,6 +152,9 @@ function WritePost(props) {
 		{ id: 6, name: "Sinh to" },
 	];
 
+	//mainbackground image for CAPTION
+	let captionMainBackground;
+
 	//user upload image for CAPTION
 	let sendImage = async (e) => {
 		let files = e.target.files;
@@ -160,7 +173,6 @@ function WritePost(props) {
 		);
 
 		const file = await response.json();
-
 		setCoverUrl(file.secure_url);
 
 		let { caption, category, content, tagsList } = postContent;
@@ -172,6 +184,7 @@ function WritePost(props) {
 				category: category,
 				content: content,
 				tagsList: tagsList,
+				cloudinary_public_id: file.public_id,
 			})
 		);
 
@@ -180,32 +193,37 @@ function WritePost(props) {
 		setLoading(2);
 	};
 
-	//user upload image for their CONTENT inside
-	let contentImageUpload = async (e) => {
-		let files = e.target.files;
-		let data = new FormData();
-		data.append("file", files[0]);
-		data.append("upload_preset", "bdyzskvu");
-
-		setContentImageLoading(1);
-
-		const response = await fetch(
-			"https://api.cloudinary.com/v1_1/djbkxkx8m/image/upload",
-			{
-				method: "POST",
-				body: data,
-			}
-		);
-
-		const file = await response.json();
-
-		setContentImageMarkdown(`![Alt Text](${file.secure_url})`);
-
-		setContentImageLoading(2);
+	//change and remove button events
+	const changeCaptionMainBackground = (e) => {
+		removeCaptionMainbackground(e);
+		sendImage(e);
 	};
 
-	//mainbackground image for CAPTION
-	let captionMainBackground;
+	//event for remove caption image
+	const removeCaptionMainbackground = (e) => {
+		axios.delete(API_URL + "/deleteImage", {
+			data: {
+				public_id: postContent.cloudinary_public_id,
+			},
+		});
+
+		let { caption, category, content, tagsList } = postContent;
+
+		setPostContent(
+			(postContent = {
+				caption: caption,
+				mainbackground: "",
+				category: category,
+				content: content,
+				tagsList: tagsList,
+				cloudinary_public_id: "",
+			})
+		);
+
+		localStorage.setItem("post-content", JSON.stringify(postContent));
+
+		setLoading(0);
+	};
 
 	if (loading === 0) {
 		captionMainBackground = (
@@ -238,13 +256,14 @@ function WritePost(props) {
 					width={24}
 					radius={0}
 				/>
-				<h3
+				<h4
 					style={{
-						marginLeft: "5px",
+						marginLeft: "6px",
+						fontSize: "17px",
 					}}
 				>
-					Uploading....
-				</h3>
+					Uploading
+				</h4>
 			</>
 		);
 	} else if (loading === 2) {
@@ -269,20 +288,21 @@ function WritePost(props) {
 							padding: "0.5em 1em",
 						}}
 					>
-						<span
-							style={{
-								fontFamily: "Nunito",
-								fontSize: "15px",
-								fontWeight: "600",
-							}}
-						>
-							Change
-						</span>
+						<label for="cover-image-input">Change</label>
+						<input
+							id="cover-image-input"
+							type="file"
+							accept="image/*"
+							className="upload-cover-btn"
+							name="cover-image"
+							onChange={changeCaptionMainBackground}
+						/>
 					</button>
 
 					<button
-						className="post-cover-image"
+						className="post-cover-image removeBtn"
 						style={{ padding: "0.5em 1em", border: "none" }}
+						onClick={removeCaptionMainbackground}
 					>
 						<span
 							style={{
@@ -302,6 +322,30 @@ function WritePost(props) {
 
 	//image for CONTENT
 	let contentImageComponent;
+
+	//user upload image for their CONTENT inside
+	let contentImageUpload = async (e) => {
+		let files = e.target.files;
+		let data = new FormData();
+		data.append("file", files[0]);
+		data.append("upload_preset", "bdyzskvu");
+
+		setContentImageLoading(1);
+
+		const response = await fetch(
+			"https://api.cloudinary.com/v1_1/djbkxkx8m/image/upload",
+			{
+				method: "POST",
+				body: data,
+			}
+		);
+
+		const file = await response.json();
+
+		setContentImageMarkdown(`![Alt Text](${file.secure_url})`);
+
+		setContentImageLoading(2);
+	};
 
 	if (contentImageLoading === 1) {
 		contentImageComponent = (
@@ -343,6 +387,7 @@ function WritePost(props) {
 				category,
 				content,
 				tagsList,
+				cloudinary_public_id,
 			} = postContent;
 
 			let textarea = JSON.parse(localStorage.getItem("textarea-height"));
@@ -359,6 +404,7 @@ function WritePost(props) {
 							category: category,
 							content: content,
 							tagsList: tagsList,
+							cloudinary_public_id: cloudinary_public_id,
 						})
 					);
 
@@ -374,6 +420,7 @@ function WritePost(props) {
 							category: category,
 							content: e.target.value,
 							tagsList: tagsList,
+							cloudinary_public_id: cloudinary_public_id,
 						})
 					);
 
@@ -399,7 +446,7 @@ function WritePost(props) {
 
 		postContent.tagsList = tagWords.slice(0, tagWords.length);
 
-		axios.post("http://localhost:8080/addPost", { postContent });
+		axios.post(API_URL + "/addPost", { postContent });
 
 		localStorage.removeItem("post-content");
 		localStorage.removeItem("textarea-height");

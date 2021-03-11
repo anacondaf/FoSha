@@ -18,6 +18,7 @@ app.use(bodyParser.json());
 //ROUTES
 const GETPOSTS = require("./routes/getPosts");
 const ADDPOST = require("./routes/addPost");
+const DELETE_IMAGE = require("./routes/deleteImage");
 
 mongoose.connect(
 	process.env.MONGO_URL,
@@ -37,6 +38,7 @@ app.get("/", (req, res) => {
 //Use middleware
 app.use("/getPosts", GETPOSTS);
 app.use("/addPost", ADDPOST);
+app.use("/deleteImage", DELETE_IMAGE);
 
 app.listen(PORT, () => {
 	console.log(`Server is running on ${PORT}`);
