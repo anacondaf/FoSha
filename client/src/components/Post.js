@@ -28,10 +28,6 @@ function PostItem(props) {
 						<Icon clasName="mdi" path={mdiTagTextOutline} />{" "}
 						<a>{item.tags.length} tags</a>
 					</li>
-					<li>
-						<Icon clasName="mdi" path={mdiCommentMultipleOutline} />{" "}
-						<a>{item.comments} Comments</a>
-					</li>
 				</ul>
 			</div>
 

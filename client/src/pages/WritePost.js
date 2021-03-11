@@ -397,7 +397,7 @@ function WritePost(props) {
 			postContent.tagsList = tagWords.slice(0, tagWords.length - 1);
 		} else postContent.tagsList = tagWords.slice(0, tagWords.length);
 
-		axios.post("http://localhost:3004/addPost", { postContent });
+		axios.post("https://api-fosha.herokuapp.com/addPost", { postContent });
 
 		localStorage.removeItem("post-content");
 		localStorage.removeItem("textarea-height");

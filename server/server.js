@@ -5,17 +5,15 @@ let app = express();
 let bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const cors = require("cors");
-
-// do react chay tren port 3000
-const PORT = 3004 || process.env.PORT;
+const PORT = process.env.PORT || 8080;
 
 app.use(cors());
 
 // parse application/x-www-form-urlencoded
-app.use(express.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: false }));
 
 // parse application/json
-app.use(express.json());
+app.use(bodyParser.json());
 
 //ROUTES
 const GETPOSTS = require("./routes/getPosts");

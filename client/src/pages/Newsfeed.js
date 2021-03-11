@@ -23,7 +23,7 @@ function Newsfeed() {
 	//call api
 	useEffect(() => {
 		axios
-			.get("http://localhost:3004/getPosts")
+			.get("https://api-fosha.herokuapp.com/getPosts")
 			.then((res) => setPostItem(res.data.postList))
 			.catch((e) => console.log(e));
 	}, [postItem]);
