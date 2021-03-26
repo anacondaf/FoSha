@@ -2,13 +2,7 @@ import React from "react";
 import ReactMarkDown from "react-markdown";
 
 import Icon from "@mdi/react";
-import {
-	mdiTagTextOutline,
-	mdiCalendar,
-	mdiCommentMultipleOutline,
-	mdiArrowRight,
-	mdiArrowUp,
-} from "@mdi/js";
+import { mdiTagTextOutline, mdiCalendar, mdiArrowRight } from "@mdi/js";
 
 function PostItem(props) {
 	let { item } = props;
@@ -28,6 +22,10 @@ function PostItem(props) {
 						<Icon clasName="mdi" path={mdiTagTextOutline} />{" "}
 						<a>{item.tags.length} tags</a>
 					</li>
+					<li>
+						<i className="far fa-save"></i>
+						<a className="saved-button">Save</a>
+					</li>
 				</ul>
 			</div>
 
@@ -44,7 +42,7 @@ function PostItem(props) {
 			</div>
 
 			<div>
-				<a href="index.html" class="btn btn-outline-custom">
+				<a href={`/view/${item._id}`} class="btn btn-outline-custom">
 					Read More <Icon path={mdiArrowRight} />
 				</a>
 			</div>

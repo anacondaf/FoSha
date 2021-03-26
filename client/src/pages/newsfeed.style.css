@@ -143,6 +143,10 @@
 	margin: 0 5px;
 }
 
+.post-meta .saved-button {
+	cursor: pointer;
+}
+
 .post-preview {
 	-webkit-transition: all 0.3s ease-out;
 	transition: all 0.3s ease-out;
@@ -221,7 +225,8 @@
 
 .post-title a:hover,
 .search-button:hover,
-.post-meta a[href]:hover {
+.post-meta a[href]:hover,
+.post-meta .saved-button:hover {
 	color: #0db3e3;
 }
 

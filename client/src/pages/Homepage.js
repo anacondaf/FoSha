@@ -13,7 +13,7 @@ function Homepage() {
 					<p
 						class="typewrite"
 						data-period="2000"
-						data-type='[ "Hi! We are FoSha.", "We are social.", "We are creative.", "We are innovation." ]'
+						data-type='[ "Hi! We are FoSha", "We are social", "We are creative", "We made for culinary art" ]'
 					>
 						<span class="wrap"></span>
 					</p>

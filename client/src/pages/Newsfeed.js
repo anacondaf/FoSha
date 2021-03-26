@@ -2,13 +2,10 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 
 import Icon from "@mdi/react";
-import {
-	mdiTagTextOutline,
-	mdiCalendar,
-	mdiCommentMultipleOutline,
-	mdiArrowRight,
-	mdiArrowUp,
-} from "@mdi/js";
+import { mdiArrowUp } from "@mdi/js";
+
+//URL
+import { API_URL } from "../config/url";
 
 //css
 import "./newsfeed.style.css";
@@ -23,7 +20,7 @@ function Newsfeed() {
 	//call api
 	useEffect(() => {
 		axios
-			.get("http://localhost:8080/getPosts")
+			.get(API_URL + "/getPosts")
 			.then((res) => setPostItem(res.data.postList))
 			.catch((e) => console.log(e));
 	}, [postItem]);

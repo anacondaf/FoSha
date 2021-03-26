@@ -15,10 +15,10 @@
 .typewritter {
 	display: block;
 	position: absolute;
-	width: 500px;
+	width: 600px;
 	height: 100px;
 	top: calc(50% - 50px);
-	left: calc(50% - 250px);
+	left: calc(50% - 300px);
 	text-align: center;
 	color: #fff;
 	font-size: 24px;

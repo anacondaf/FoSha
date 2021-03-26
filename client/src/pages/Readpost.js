@@ -6,6 +6,9 @@ import axios from "axios";
 
 import { useParams } from "react-router-dom";
 
+//URL
+import { API_URL } from "../config/url";
+
 //css
 import "./readpost.style.css";
 
@@ -22,7 +25,7 @@ function Readpost(props) {
 
 	useEffect(() => {
 		axios
-			.get(`http://localhost:8080/getPosts/${post_id}`)
+			.get(`${API_URL}/getPosts/${post_id}`)
 			.then((result) => {
 				setPostContent(result.data.postContent);
 			})
@@ -40,7 +43,9 @@ function Readpost(props) {
 
 					<div className="content-main">
 						<div className="content-header">
-							<ReactMarkDown children={post.caption} className="caption" />
+							<h2 className="post-caption" style={{ margin: 0, fontSize: 30 }}>
+								{post.caption}
+							</h2>
 
 							<ul className="tags">
 								{post.tags.map((tag) => {

@@ -3,14 +3,20 @@ import { Redirect } from "react-router-dom";
 import axios from "axios";
 import autosize from "autosize";
 
+//URL
+import { API_URL } from "../config/url";
+
 //css
 import "./Writepost.style.css";
 
 import Icon from "@mdi/react";
-import { mdiArrowLeft, mdiFileImageOutline } from "@mdi/js";
+import { mdiFileImageOutline } from "@mdi/js";
 import Loader from "react-loader-spinner";
 
-const API_URL = "http://localhost:8080";
+//custom component
+import EmojiPicker from "../components/EmojiPicker";
+import Preview from "../components/Preview";
+import WritePostNavbar from "../components/WritePostNavbar";
 
 function WritePost(props) {
 	//cover image state
@@ -43,6 +49,13 @@ function WritePost(props) {
 	//caption-field and content-field height
 	let [captionHeight, setCaptionHeight] = useState(68);
 	let [contentHeight, setContentHeight] = useState(240);
+
+	//Post property window
+	let [postProperty, setPostProperty] = useState("edit");
+	let [comboButtonState, setComboButtonState] = useState(0);
+
+	//get the current cursor position in content-textfield
+	let [cursorPos, setCursorPos] = useState(0);
 
 	//useRef
 	let popup = useRef();
@@ -432,8 +445,6 @@ function WritePost(props) {
 	};
 
 	const postPostToApi = () => {
-		postContent.caption = "# ".concat(postContent.caption);
-
 		let tagWords = tags.split(/\W+/);
 
 		if (tagWords[tagWords.length - 1] === "") {
@@ -454,147 +465,246 @@ function WritePost(props) {
 		setRedirect("/newsfeed");
 	};
 
+	const userAddEmoji = (emoji, event) => {
+		let {
+			caption,
+			mainbackground,
+			category,
+			content,
+			tagsList,
+			cloudinary_public_id,
+		} = postContent;
+
+		setPostContent(
+			(postContent = {
+				caption: caption,
+				mainbackground: mainbackground,
+				category: category,
+				content:
+					content.slice(0, cursorPos) + emoji.native + content.slice(cursorPos),
+				tagsList: tagsList,
+				cloudinary_public_id: cloudinary_public_id,
+			})
+		);
+
+		localStorage.setItem("post-content", JSON.stringify(postContent));
+	};
+
+	const triggerPostProperty = (e) => {
+		const comboButtons = document.querySelectorAll(".combo-button");
+
+		//Change state to change to post window
+		switch (e.target.innerHTML) {
+			case "Edit":
+				{
+					if (!e.target.classList.contains("isFocused")) {
+						setComboButtonState(0);
+					}
+
+					setPostProperty("edit");
+				}
+
+				break;
+			case "Preview":
+				{
+					if (!e.target.classList.contains("isFocused")) {
+						setComboButtonState(1);
+					}
+					setPostProperty("preview");
+				}
+				break;
+			default:
+				setPostProperty("edit");
+		}
+	};
+
 	return redirect !== null ? (
 		<Redirect to={redirect} />
 	) : (
-		<div className="write-post main">
+		<div className="write-post">
 			<div className="all-container">
-				<div className="left-side-block">
-					<div className="top-navbar">
-						<div className="controll-block">
-							<a href="/newsfeed" className="back-to-home">
-								<Icon path={mdiArrowLeft} color="rgb(148, 148, 148" />
-							</a>
+				{postProperty === "edit" ? (
+					<div className="left-side-block">
+						<WritePostNavbar
+							triggerPostProperty={triggerPostProperty}
+							comboButtonState={comboButtonState}
+						/>
 
-							<p>Write new post</p>
-						</div>
+						<div className="editing-content">
+							<div className="post-header-field post-inner">
+								<div className="upload-cover-image">
+									{captionMainBackground}
+								</div>
 
-						<div className="combo-function">
-							<a href="" className="edit-btn isFocused">
-								Edit
-							</a>
-							<a href="" className="preview-btn">
-								Preview
-							</a>
-						</div>
-					</div>
+								<div className="article-form-title">
+									<textarea
+										type="text"
+										id="article-form-title"
+										placeholder="New post title here..."
+										autocomplete="off"
+										className="caption-textfield"
+										aria-label="Post Title"
+										autofocus="true"
+										onKeyDown={preventNewLine()}
+										onChange={changePostContent()}
+										value={postContent.caption}
+										style={{ height: captionHeight, resize: "none" }}
+										ref={captionTextField}
+									></textarea>
+								</div>
 
-					<div className="editing-content">
-						<div className="post-header-field post-inner">
-							<div className="upload-cover-image">{captionMainBackground}</div>
-
-							<div className="article-form-title">
-								<textarea
+								<input
+									data-testid="tag-input"
+									id="tag-input"
 									type="text"
-									id="article-form-title"
-									placeholder="New post title here..."
+									placeholder="Add up to 4 tags..."
 									autocomplete="off"
-									className="caption-textfield"
-									aria-label="Post Title"
-									autofocus="true"
+									className="tags-textfield"
+									aria-label="Post Tag"
+									pattern="[0-9A-Za-z, ]+"
 									onKeyDown={preventNewLine()}
-									onChange={changePostContent()}
-									value={postContent.caption}
-									style={{ height: captionHeight, resize: "none" }}
-									ref={captionTextField}
-								></textarea>
-							</div>
+									onKeyUp={onKeyUp}
+									onChange={changeTags}
+									value={tags}
+								></input>
 
-							<input
-								data-testid="tag-input"
-								id="tag-input"
-								type="text"
-								placeholder="Add up to 4 tags..."
-								autocomplete="off"
-								className="tags-textfield"
-								aria-label="Post Tag"
-								pattern="[0-9A-Za-z, ]+"
-								onKeyDown={preventNewLine()}
-								onKeyUp={onKeyUp}
-								onChange={changeTags}
-								value={tags}
-							></input>
+								<div className="category-group">
+									<label for="sel-btn" className="select-label">
+										Give your recipe a category
+									</label>
 
-							<div className="category-group">
-								<label for="sel-btn" className="select-label">
-									Give your recipe a category
-								</label>
-
-								<div className="select-area">
-									<div
-										className="select-button"
-										id="sel-btn"
-										onClick={dropOption}
-									>
-										<span>Food</span>
-										<div className="chevrons">
-											<i className="fas fa-chevron-up icon-chevron"></i>
-											<i className="fas fa-chevron-down icon-chevron"></i>
+									<div className="select-area">
+										<div
+											className="select-button"
+											id="sel-btn"
+											onClick={dropOption}
+										>
+											<span>
+												{postContent.category ? postContent.category : "Food"}
+											</span>
+											<div className="chevrons">
+												<i className="fas fa-chevron-up icon-chevron"></i>
+												<i className="fas fa-chevron-down icon-chevron"></i>
+											</div>
+										</div>
+										<div className="options drop">
+											{OPTIONS.map((option, index) => {
+												return (
+													<div
+														className="option"
+														onClick={userChooseOption}
+														key={index}
+													>
+														{option.name}
+													</div>
+												);
+											})}
 										</div>
 									</div>
-									<div className="options drop">
-										{OPTIONS.map((option, index) => {
-											return (
-												<div
-													className="option"
-													onClick={userChooseOption}
-													key={index}
-												>
-													{option.name}
-												</div>
-											);
-										})}
-									</div>
+								</div>
+							</div>
+
+							<div className="post-body-field post-inner">
+								<div className="content-image">
+									<button className="post-content-image">
+										<Icon path={mdiFileImageOutline} />
+										<span>Upload Image</span>
+										<input
+											id="content-image-input"
+											className="upload-image-btn"
+											type="file"
+											accept="image/*"
+											name="content-image"
+											onChange={contentImageUpload}
+										/>
+									</button>
+									{contentImageComponent}
+								</div>
+
+								<div className="post-body-wrap-content">
+									<textarea
+										type="text"
+										placeholder="Start your content ..."
+										autocomplete="off"
+										className="content-textfield"
+										aria-label="Post Content"
+										onChange={changePostContent()}
+										onSelect={() => {
+											let x = document.querySelector(".content-textfield");
+											setCursorPos(x.selectionStart);
+										}}
+										value={postContent.content}
+										style={{ height: contentHeight, resize: "none" }}
+										ref={contentTextField}
+									></textarea>
 								</div>
 							</div>
 						</div>
 
-						<div className="post-body-field post-inner">
-							<div className="content-image">
-								<button className="post-content-image">
-									<Icon path={mdiFileImageOutline} />
-									<span>Upload Image</span>
-									<input
-										id="content-image-input"
-										className="upload-image-btn"
-										type="file"
-										accept="image/*"
-										name="content-image"
-										onChange={contentImageUpload}
-									/>
-								</button>
-								{contentImageComponent}
+						<div className="bottom-end  ml-5">
+							<div className="publish-and-save">
+								<a
+									className="btn btn-outline-custom isFocused"
+									onClick={postPostToApi}
+								>
+									Publish
+								</a>
+
+								<a className="btn btn-outline-custom">Save</a>
 							</div>
 
-							<div className="post-body-wrap-content">
-								<textarea
-									type="text"
-									placeholder="Start your content ..."
-									autocomplete="off"
-									className="content-textfield"
-									aria-label="Post Content"
-									onChange={changePostContent()}
-									value={postContent.content}
-									style={{ height: contentHeight, resize: "none" }}
-									ref={contentTextField}
-								></textarea>
+							<div className="help.md">
+								<i>
+									You can use this file for syntax guiding{" "}
+									<span>
+										<a
+											href="https://drive.google.com/file/d/1OY_yguuEG1qQezFM1_KVI0-U1elWMwbf/view"
+											target="_blank"
+											className="helpme"
+										>
+											help.md
+										</a>
+									</span>
+								</i>
 							</div>
 						</div>
+
+						<div className="tabs-list">
+							<div
+								className="tab emoji"
+								onClick={(e) => {
+									let tab = document.querySelectorAll(".tab");
+									tab[0].classList.toggle("emoji-animation");
+
+									let emojiMart = document.querySelector(".emoji-mart");
+									emojiMart.classList.toggle("emoji-mart-hide-show");
+								}}
+							>
+								<i className="fas fa-smile"></i>
+								<p>Emoji</p>
+							</div>
+
+							<div
+								className="tab guide"
+								onClick={(e) => {
+									let tab = document.querySelectorAll(".tab");
+									console.log(tab);
+									tab[1].classList.toggle("emoji-animation");
+								}}
+							>
+								<i class="fas fa-info"></i>
+								<p>Guide</p>
+							</div>
+						</div>
+
+						<EmojiPicker userAddEmoji={userAddEmoji} />
 					</div>
-
-					<div className="publish-and-save ml-5">
-						<a
-							className="btn btn-outline-custom isFocused"
-							onClick={postPostToApi}
-						>
-							Publish
-						</a>
-
-						<a className="btn btn-outline-custom">Save</a>
-					</div>
-				</div>
-
-				<div className="right-side-block"></div>
+				) : (
+					<Preview
+						triggerPostProperty={triggerPostProperty}
+						comboButtonState={comboButtonState}
+					/>
+				)}
 			</div>
 		</div>
 	);
