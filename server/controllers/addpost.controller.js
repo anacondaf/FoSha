@@ -10,19 +10,23 @@ let yyyy = today.getFullYear();
 
 today = yyyy + "-" + mm + "-" + dd;
 
-module.exports.addPost = (req, res) => {
-	let { postContent } = req.body;
+module.exports.addPost = async (req, res) => {
+	try {
+		let { postContent } = req.body;
 
-	let newPost = new Post({
-		_id: new mongoose.Types.ObjectId(),
-		caption: postContent.caption,
-		mainbackground: postContent.mainbackground,
-		category: postContent.category,
-		description: postContent.content.substring(0, 100),
-		content: postContent.content,
-		date: today,
-		tags: postContent.tagsList,
-	});
+		let newPost = new Post({
+			_id: new mongoose.Types.ObjectId(),
+			caption: postContent.caption,
+			mainbackground: postContent.mainbackground,
+			category: postContent.category,
+			description: postContent.content.substring(0, 100),
+			content: postContent.content,
+			date: today,
+			tags: postContent.tagsList,
+		});
 
-	newPost.save().catch((e) => console.log(e));
+		await newPost.save();
+
+		res.status(200).json({ msg: "Add oke" });
+	} catch (error) {}
 };
