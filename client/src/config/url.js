@@ -1,2 +1,2 @@
-export const API_URL = "localhost:3000";
+export const API_URL = "http://localhost:3001";
 // "https://api-fosha.herokuapp.com"
