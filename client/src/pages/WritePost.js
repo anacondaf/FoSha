@@ -68,8 +68,6 @@ function WritePost(props) {
   let prevTags = usePrevious(tags);
 
   useEffect(() => {
-    console.log(process.env.NODE_ENV);
-
     if (JSON.parse(localStorage.getItem("post-content")) === null) {
       localStorage.setItem("post-content", JSON.stringify(postContent));
     } else {
