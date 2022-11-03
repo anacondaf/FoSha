@@ -198,13 +198,13 @@
 	margin-right: 0.5em;
 }
 
-.tags-generator > span:not(:first-child):not(:last-child) {
+.tags-generator > span:not(:first-child) {
 	margin: 0 0.5em;
 }
 
-.tags-generator>span:last-child {
+/* .tags-generator>span:last-child {
 	margin-left: 0.5em;
-}
+} */
 
 .category-group {
 	position: relative;

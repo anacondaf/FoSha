@@ -4,16 +4,20 @@ import axios from "axios";
 import autosize from "autosize";
 import debounce from "lodash/debounce";
 
-import usePrevious from "../helpers/usePrevious";
-
 //URL
 import { API_URL } from "../config/url";
+
+//Constants
+import {
+  WRITE_PORT_TEXT_AREA_WIDTH,
+  EM_TO_PX_STANDARD,
+} from "../config/constants";
 
 //css
 import "./Writepost.style.css";
 
 import Icon from "@mdi/react";
-import { mdiFileImageOutline } from "@mdi/js";
+import { mdiConsoleNetworkOutline, mdiFileImageOutline } from "@mdi/js";
 import Loader from "react-loader-spinner";
 
 //custom component
@@ -21,7 +25,10 @@ import EmojiPicker from "../components/EmojiPicker";
 import Preview from "../components/Preview";
 import WritePostNavbar from "../components/WritePostNavbar";
 
-function WritePost(props) {
+function WritePost() {
+  //constants
+  let currentTagListWidth = 0;
+
   //cover image state
   let [coverUrl, setCoverUrl] = useState("");
 
@@ -45,8 +52,8 @@ function WritePost(props) {
   });
 
   let [tags, setTags] = useState("");
+  let [tagDisabled, setTagDisabled] = useState(false);
 
-  //redirect to /newsfeed
   let [redirect, setRedirect] = useState(null);
 
   //caption-field and content-field height
@@ -64,8 +71,6 @@ function WritePost(props) {
   let popup = useRef();
   let captionTextField = useRef();
   let contentTextField = useRef();
-
-  let prevTags = usePrevious(tags);
 
   useEffect(() => {
     if (JSON.parse(localStorage.getItem("post-content")) === null) {
@@ -93,36 +98,72 @@ function WritePost(props) {
 
     autosize(contentTextField.current);
     autosize(captionTextField.current);
+
+    if (localStorage.getItem("tags")) {
+      console.log(tags);
+      setTags(localStorage.getItem("tags"));
+      addSpanToTagsGenerator(tags);
+    }
   }, []);
 
   //#region Tag handler
-  const addCommaToEndOfTagString = useCallback((currentTagString) => {
+  const addCommaToEndOfTagString = (currentTagString) => {
     const commaFormatString = ", ";
 
     setTags(currentTagString + commaFormatString);
-  });
+  };
 
-  const addSpanToTagsGenerator = () => {
+  const createAndAppendTag = (string) => {
     const newTagElement = document.createElement("span");
-    newTagElement.innerText = prevTags;
+    newTagElement.innerText = string;
 
     const tagsGenerator = document.getElementsByClassName("tags-generator")[0];
 
-    // console.log(tagsGenerator);
     tagsGenerator.appendChild(newTagElement);
+
+    let tagOffsetWidth = newTagElement?.offsetWidth;
+
+    if (currentTagListWidth == 0) {
+      tagOffsetWidth += EM_TO_PX_STANDARD["0.5"];
+    } else {
+      tagOffsetWidth += EM_TO_PX_STANDARD["1"];
+    }
+
+    if (currentTagListWidth + tagOffsetWidth <= WRITE_PORT_TEXT_AREA_WIDTH) {
+      currentTagListWidth += tagOffsetWidth;
+    } else {
+      tagsGenerator.removeChild(tagsGenerator.lastElementChild);
+      setTagDisabled(!tagDisabled);
+    }
   };
+
+  const addSpanToTagsGenerator = useCallback(
+    (currentTagString) => {
+      const tagArray = currentTagString.split(",");
+
+      if (tagArray <= 1) {
+        tagArray.map((val) => {
+          createAndAppendTag(val);
+        });
+      } else {
+        createAndAppendTag(tagArray[tagArray.length - 1]);
+      }
+    },
+    [tags]
+  );
 
   const debounceTagChange = useCallback(
     debounce((currentTagString) => {
-      console.log(tags);
       addCommaToEndOfTagString(currentTagString);
-      addSpanToTagsGenerator();
-    }, 1000),
+      addSpanToTagsGenerator(currentTagString);
+    }, 850),
     []
   );
 
   const changeTags = (e) => {
     let value = e.target.value;
+
+    localStorage.setItem("tags", JSON.stringify(value));
 
     setTags(value);
     debounceTagChange(value);
@@ -589,13 +630,10 @@ function WritePost(props) {
                     onKeyDown={preventNewLine()}
                     onChange={changeTags}
                     value={tags}
+                    disabled={tagDisabled}
                   ></input>
 
-                  <div className="tags-generator">
-                    <span>{prevTags}</span>
-                    <span># javascript</span>
-                    <span># javascript</span>
-                  </div>
+                  <div className="tags-generator"></div>
                 </div>
 
                 <div className="category-group">
