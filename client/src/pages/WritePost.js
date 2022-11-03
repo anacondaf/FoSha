@@ -17,7 +17,7 @@ import {
 import "./Writepost.style.css";
 
 import Icon from "@mdi/react";
-import { mdiConsoleNetworkOutline, mdiFileImageOutline } from "@mdi/js";
+import { mdiFileImageOutline } from "@mdi/js";
 import Loader from "react-loader-spinner";
 
 //custom component
@@ -109,31 +109,35 @@ function WritePost() {
   //#region Tag handler
   const addCommaToEndOfTagString = (currentTagString) => {
     const commaFormatString = ", ";
-
-    setTags(currentTagString + commaFormatString);
+    if (tags) {
+      setTags(currentTagString + commaFormatString);
+    }
   };
 
   const createAndAppendTag = (string) => {
-    const newTagElement = document.createElement("span");
-    newTagElement.innerText = string;
+    if (tags) {
+      const newTagElement = document.createElement("span");
+      newTagElement.innerText = string;
 
-    const tagsGenerator = document.getElementsByClassName("tags-generator")[0];
+      const tagsGenerator =
+        document.getElementsByClassName("tags-generator")[0];
 
-    tagsGenerator.appendChild(newTagElement);
+      tagsGenerator.appendChild(newTagElement);
 
-    let tagOffsetWidth = newTagElement?.offsetWidth;
+      let tagOffsetWidth = newTagElement?.offsetWidth;
 
-    if (currentTagListWidth == 0) {
-      tagOffsetWidth += EM_TO_PX_STANDARD["0.5"];
-    } else {
-      tagOffsetWidth += EM_TO_PX_STANDARD["1"];
-    }
+      if (currentTagListWidth == 0) {
+        tagOffsetWidth += EM_TO_PX_STANDARD["0.5"];
+      } else {
+        tagOffsetWidth += EM_TO_PX_STANDARD["1"];
+      }
 
-    if (currentTagListWidth + tagOffsetWidth <= WRITE_PORT_TEXT_AREA_WIDTH) {
-      currentTagListWidth += tagOffsetWidth;
-    } else {
-      tagsGenerator.removeChild(tagsGenerator.lastElementChild);
-      setTagDisabled(!tagDisabled);
+      if (currentTagListWidth + tagOffsetWidth <= WRITE_PORT_TEXT_AREA_WIDTH) {
+        currentTagListWidth += tagOffsetWidth;
+      } else {
+        tagsGenerator.removeChild(tagsGenerator.lastElementChild);
+        setTagDisabled(!tagDisabled);
+      }
     }
   };
 
@@ -617,7 +621,7 @@ function WritePost() {
                   ></textarea>
                 </div>
 
-                <div className="tag-field">
+                {/* <div className="tag-field">
                   <input
                     data-testid="tag-input"
                     id="tag-input"
@@ -634,7 +638,7 @@ function WritePost() {
                   ></input>
 
                   <div className="tags-generator"></div>
-                </div>
+                </div> */}
 
                 <div className="category-group">
                   <label for="sel-btn" className="select-label">

@@ -6,6 +6,8 @@ let bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const PORT = process.env.PORT || 3001;
+const AppError = require("./utils/AppError");
+const httpStatus = require("http-status-codes");
 
 app.use(cors());
 
@@ -16,30 +18,56 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 //ROUTES
-const GETPOSTS = require("./routes/getPosts");
-const ADDPOST = require("./routes/addPost");
-const DELETE_IMAGE = require("./routes/deleteImage");
+const api = require("./routes");
 
 mongoose.connect(
-	process.env.MONGO_URL,
-	{
-		useNewUrlParser: true,
-		useUnifiedTopology: true,
-	},
-	() => {
-		console.log("Database is connected");
-	}
+  process.env.MONGO_URL,
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  },
+  () => {
+    console.log("Database is connected");
+  }
 );
 
 app.get("/", (req, res) => {
-	res.send("Welcome to Fosha API");
+  res.send("Welcome to Fosha API");
 });
 
-//Use middleware
-app.use("/getPosts", GETPOSTS);
-app.use("/addPost", ADDPOST);
-app.use("/deleteImage", DELETE_IMAGE);
+app.use("/api", api);
+
+/**
+ * -------------- ERROR HANDLER ----------------
+ */
+
+// Catch 404 and forward to error handler
+app.use(function (req, res, next) {
+  next(new AppError(httpStatus.StatusCodes.NOT_FOUND, "Not found.", true));
+});
+
+// Error handler
+app.use(function (err, req, res, next) {
+  let message;
+  let status;
+
+  if (err.name === "SequelizeUniqueConstraintError") {
+    message = err.errors[0].message;
+    status = httpStatus.StatusCodes.UNPROCESSABLE_ENTITY;
+    type = `${err.errors[0].path}.used`;
+  } else {
+    message = err.message;
+    status = err.statusCode
+      ? err.statusCode
+      : httpStatus.StatusCodes.INTERNAL_SERVER_ERROR;
+  }
+
+  res.status(status).json({
+    statusCode: status,
+    message,
+  });
+});
 
 app.listen(PORT, () => {
-	console.log(`Server is running on ${PORT}`);
+  console.log(`Server is running on ${PORT}`);
 });
